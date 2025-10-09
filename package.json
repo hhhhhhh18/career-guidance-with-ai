@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "npm install --legacy-peer-deps && next build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate"
@@ -33,7 +33,7 @@
     "html2pdf.js": "^0.10.2",
     "inngest": "^3.29.3",
     "lucide-react": "^0.471.1",
-    "next": "^15.5.4",
+    "next": "^15.2.3",
     "next-themes": "^0.4.4",
     "openai": "^6.1.0",
     "react": "^19.0.0",
