@@ -121,6 +121,7 @@ export async function getCoverLetter(id) {
     },
   });
 }
+console.log("✅ cover-letter.js loaded");
 
 export async function deleteCoverLetter(id) {
   const { userId } = await auth();
