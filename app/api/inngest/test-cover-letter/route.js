@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateCoverLetter } from "@/actions/cover-letter";
+import { generateCoverLetter } from "../../../actions/cover-letter.js";
 
 export async function GET() {
   try {
