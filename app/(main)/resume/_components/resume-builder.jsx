@@ -23,14 +23,21 @@ import useFetch from "@/hooks/use-fetch";
 import { useUser } from "@clerk/nextjs";
 import { entriesToMarkdown } from "@/app/lib/helper";
 import { resumeSchema } from "@/app/lib/schema";
-import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
+
 
 export default function ResumeBuilder({ initialContent }) {
   const [activeTab, setActiveTab] = useState("edit");
   const [previewContent, setPreviewContent] = useState(initialContent);
   const { user } = useUser();
   const [resumeMode, setResumeMode] = useState("preview");
-
+  const handleDownload = async () => {
+    const html2pdf = (await import("html2pdf.js")).default;
+  
+    const element = document.getElementById("resume-preview");
+  
+    html2pdf().from(element).save();
+  };
+  
   const {
     control,
     register,
@@ -46,6 +53,8 @@ export default function ResumeBuilder({ initialContent }) {
       experience: [],
       education: [],
       projects: [],
+      certifications:[],
+      languages:[],
     },
   });
 
@@ -80,7 +89,19 @@ export default function ResumeBuilder({ initialContent }) {
       toast.error(saveError.message || "Failed to save resume");
     }
   }, [saveResult, saveError, isSaving]);
-
+  const [contactHeader, setContactHeader] = useState("");
+  useEffect(() => {
+    const header = getContactMarkdown();
+    if (header) {
+      setContactHeader(header);
+    }
+  }, [
+    formValues.contactInfo?.email,
+    formValues.contactInfo?.mobile,
+    formValues.contactInfo?.linkedin,
+    formValues.contactInfo?.github,
+  ]);
+  
   const getContactMarkdown = () => {
     const { contactInfo } = formValues;
     const parts = [];
@@ -97,14 +118,16 @@ export default function ResumeBuilder({ initialContent }) {
   };
 
   const getCombinedContent = () => {
-    const { summary, skills, experience, education, projects } = formValues;
+    const { summary, skills, experience, education, projects, certifications,languages, } = formValues;
     return [
-      getContactMarkdown(),
+      contactHeader || getContactMarkdown(),
       summary && `## Professional Summary\n\n${summary}`,
       skills && `## Skills\n\n${skills}`,
       entriesToMarkdown(experience, "Work Experience"),
       entriesToMarkdown(education, "Education"),
       entriesToMarkdown(projects, "Projects"),
+      entriesToMarkdown(certifications, "Certifications"),
+  entriesToMarkdown(languages, "Known Languages"),
     ]
       .filter(Boolean)
       .join("\n\n");
@@ -358,6 +381,82 @@ export default function ResumeBuilder({ initialContent }) {
                 </p>
               )}
             </div>
+            {/* Certifications */}
+<div className="space-y-4">
+  <h3 className="text-lg font-medium">Certifications</h3>
+  <Controller
+    name="certifications"
+    control={control}
+    render={({ field }) => (
+      <EntryForm
+        type="Certification"
+        entries={field.value}
+        onChange={field.onChange}
+      />
+    )}
+  />
+</div>
+{/* Known Languages */}
+<div className="space-y-4">
+  <h3 className="text-lg font-medium">Known Languages</h3>
+
+  <Controller
+    name="languages"
+    control={control}
+    render={({ field }) => {
+      const [input, setInput] = useState("");
+
+      const addLanguage = () => {
+        if (!input.trim()) return;
+        field.onChange([...(field.value || []), input.trim()]);
+        setInput("");
+      };
+
+      const removeLanguage = (index) => {
+        field.onChange(field.value.filter((_, i) => i !== index));
+      };
+
+      return (
+        <div className="space-y-3">
+          {/* Added languages */}
+          <div className="flex flex-wrap gap-2">
+            {(field.value || []).map((lang, index) => (
+              <span
+                key={index}
+                className="flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-sm"
+              >
+                {lang}
+                <button
+                  type="button"
+                  onClick={() => removeLanguage(index)}
+                  className="text-red-500 text-xs"
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
+          </div>
+
+          {/* Input + Add button */}
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter language (e.g. English)"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <Button type="button" variant="outline" onClick={addLanguage}>
+              Add
+            </Button>
+          </div>
+        </div>
+      );
+    }}
+  />
+</div>
+
+
+
+
           </form>
         </TabsContent>
 

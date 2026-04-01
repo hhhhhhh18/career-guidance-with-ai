@@ -1,3 +1,4 @@
+import BackToHome from "@/components/back-to-home";
 import { getAssessments } from "@/actions/interview";
 import StatsCards from "./_components/stats-cards";
 import PerformanceChart from "./_components/performace-chart";
@@ -7,6 +8,9 @@ export default async function InterviewPrepPage() {
   const assessments = await getAssessments();
 
   return (
+    <>
+          <BackToHome />
+
     <div>
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-6xl font-bold gradient-title">
@@ -19,5 +23,6 @@ export default async function InterviewPrepPage() {
         <QuizList assessments={assessments} />
       </div>
     </div>
+    </>
   );
 }

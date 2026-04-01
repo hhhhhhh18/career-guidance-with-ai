@@ -16,13 +16,13 @@ export default function ClientLayout({ children }) {
       enableSystem
       disableTransitionOnChange
     >
-      <div className={isLandingPage ? "" : "bg-black text-white"}>
+      <div className={isLandingPage ? "" : "bg-background text-white"}>
         <Header />
-        <main className="min-h-screen">{children}</main>
+        <main className="min-h-screen bg-background text-foreground">{children}</main>
         <Toaster richColors />
         <footer className="bg-muted/50 py-12">
           <div className="container mx-auto px-4 text-center text-gray-200">
-            <p>Made with 💗</p>
+         
           </div>
         </footer>
       </div>

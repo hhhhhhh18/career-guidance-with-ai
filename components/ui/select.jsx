@@ -13,7 +13,7 @@ const Select = ({ children, ...props }) => {
   return (
     <>
       {isOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"></div>
+        <div className="fixed inset-0 bg-background backdrop-blur-sm z-40"></div>
       )}
       <SelectPrimitive.Root
         onOpenChange={setIsOpen}

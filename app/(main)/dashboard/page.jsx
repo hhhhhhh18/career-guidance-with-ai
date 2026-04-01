@@ -2,12 +2,12 @@ import { getIndustryInsights } from "@/actions/dashboard";
 import DashboardView from "./_component/dashboard-view";
 import { getUserOnboardingStatus } from "@/actions/user";
 import { redirect } from "next/navigation";
+import BackButton from "./_component/back-button";
 
 export default async function DashboardPage() {
   const { isOnboarded } = await getUserOnboardingStatus();
 
-  // If not onboarded, redirect to onboarding page
-  // Skip this check if already on the onboarding page
+  // Redirect if not onboarded
   if (!isOnboarded) {
     redirect("/onboarding");
   }
@@ -15,7 +15,11 @@ export default async function DashboardPage() {
   const insights = await getIndustryInsights();
 
   return (
-    <div className="container mx-auto">
+    <div className="relative container mx-auto pt-16">
+      {/* Back Button */}
+      <BackButton />
+
+      {/* Dashboard Content ONLY */}
       <DashboardView insights={insights} />
     </div>
   );

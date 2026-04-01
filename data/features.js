@@ -1,27 +1,32 @@
-import { BrainCircuit, Briefcase, LineChart, ScrollText } from "lucide-react";
+import { Brain, GraduationCap, BarChart3, FileText } from "lucide-react";
 
 export const features = [
   {
-    icon: <BrainCircuit className="w-10 h-10 mb-4 text-primary" />,
     title: "AI-Powered Career Guidance",
-    description:
-      "Get personalized career advice and insights powered by advanced AI technology.",
+    description: "Not sure what to do next in your career? Let AI analyze your profile and guide you with personalized advice",
+    icon: <Brain className="h-8 w-8" />,
+    action: "open-ai-chat"
   },
+  
   {
-    icon: <Briefcase className="w-10 h-10 mb-4 text-primary" />,
     title: "Interview Preparation",
     description:
       "Practice with role-specific questions and get instant feedback to improve your performance.",
+    icon: <GraduationCap className="h-8 w-8" />,
+    href: "/interview",
   },
   {
-    icon: <LineChart className="w-10 h-10 mb-4 text-primary" />,
     title: "Industry Insights",
     description:
       "Stay ahead with real-time industry trends, salary data, and market analysis.",
+    icon: <BarChart3 className="h-8 w-8" />,
+    href: "/dashboard",
   },
   {
-    icon: <ScrollText className="w-10 h-10 mb-4 text-primary" />,
     title: "Smart Resume Creation",
-    description: "Generate ATS-optimized resumes with AI assistance.",
+    description:
+      "Generate ATS-optimized resumes with AI assistance.",
+    icon: <FileText className="h-8 w-8" />,
+    href: "/resume",
   },
 ];

@@ -1,28 +1,32 @@
-import { useState } from "react";
-import { toast } from "sonner";
+"use client";
 
-const useFetch = (cb) => {
-  const [data, setData] = useState(undefined);
-  const [loading, setLoading] = useState(null);
+import { useState } from "react";
+
+export default function useFetch(fn) {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const fn = async (...args) => {
-    setLoading(true);
-    setError(null);
-
+  const execute = async (params) => {
     try {
-      const response = await cb(...args);
-      setData(response);
+      setLoading(true);
       setError(null);
-    } catch (error) {
-      setError(error);
-      toast.error(error.message);
+
+      const result = await fn(params); // 🔥 IMPORTANT: no wrapping
+      setData(result);
+      return result;
+    } catch (err) {
+      setError(err);
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  return { data, loading, error, fn, setData };
-};
-
-export default useFetch;
+  return {
+    loading,
+    data,
+    error,
+    fn: execute,
+  };
+}

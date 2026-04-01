@@ -7,43 +7,73 @@ import Link from "next/link";
 
 const HeroSection = () => {
   return (
-    <section className="w-full pt-36 md:pt-48 pb-10 bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      <div className="text-center mx-auto max-w-[650px] space-y-6">
-        
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
-          Your AI Career Guidance
-          <br />
-          for Professional Success
-        </h1>
+    <section
+  className="
+    relative w-full
+    pt-40 md:pt-52 pb-24
+    bg-background
+    dark:bg-gradient-to-b
+    dark:from-gray-900
+    dark:via-gray-800
+    dark:to-background
+    text-foreground
+  "
+>
+  <div className="container mx-auto px-6">
+    <div className="text-center mx-auto max-w-3xl space-y-6">
 
-       
-        <p className="text-gray-300 md:text-xl">
-          Advance your career with personalized guidance, interview prep, and
-          AI-powered tools for job success.
-        </p>
+      {/* Headline */}
+      <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
+        Your AI Career Guidance
+        <br />
+        <span className="text-primary">for Professional Success</span>
+      </h1>
 
-        
-        <div className="flex justify-center mt-6">
-          <Link href="/dashboard">
-            <button className="bg-white text-black px-8 py-3 rounded-lg font-semibold shadow-md hover:scale-105 transition-transform duration-300">
-              Start Your Journey
-            </button>
-          </Link>
-        </div>
+      {/* Subtext */}
+      <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+        Advance your career with personalized guidance, interview prep,
+        and AI-powered tools designed to help you succeed faster.
+      </p>
 
-      
-        <div className="mt-10 w-full max-w-[900px] mx-auto">
+      {/* CTA */}
+      <div className="flex justify-center pt-4">
+        <Link href="/dashboard">
+          <button
+            className="
+              bg-blue-600 text-white
+              px-10 py-4
+              rounded-xl
+              font-semibold
+              shadow-lg
+              hover:bg-blue-700
+              hover:scale-105
+              transition-all
+              duration-300
+            "
+          >
+            Start Your Journey
+          </button>
+        </Link>
+      </div>
+
+      {/* Dashboard Preview */}
+      <div className="pt-14 max-w-5xl mx-auto">
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-border">
           <Image
             src="/dashboardpic.jpg"
             alt="Dashboard Preview"
             width={1280}
             height={720}
-            className="rounded-xl shadow-2xl border border-gray-800 w-full h-auto"
+            className="w-full h-auto"
             priority
           />
         </div>
       </div>
-    </section>
+
+    </div>
+  </div>
+</section>
+
   );
 };
 
