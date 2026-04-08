@@ -20,7 +20,6 @@ model User {
   experience      Int?
   skills          String[]
   assessments     Assessment[]
-  conversations   Conversation[]
   coverLetter     CoverLetter[]
   resume          Resume?
   industryInsight IndustryInsight? @relation(fields: [industry], references: [industry])
@@ -115,7 +114,6 @@ model Conversation {
   userId    String
   title     String
   createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [clerkUserId])
   messages  Message[]
 }
 

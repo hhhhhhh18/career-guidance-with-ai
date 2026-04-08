@@ -22,8 +22,12 @@ export default function QuizResult({
       <CardContent className="space-y-6">
         {/* Score Overview */}
         <div className="text-center space-y-2">
-          <h3 className="text-2xl font-bold">{result.quizScore.toFixed(1)}%</h3>
-          <Progress value={result.quizScore} className="w-full" />
+          <h3 className="text-2xl font-bold">
+            {result?.quizScore != null
+              ? result.quizScore.toFixed(1)
+              : "0.0"}%
+          </h3>
+          <Progress value={result?.quizScore ?? 0} className="w-full" />
         </div>
 
         {/* Improvement Tip */}
@@ -48,7 +52,7 @@ export default function QuizResult({
                 )}
               </div>
               <div className="text-sm text-muted-foreground">
-                <p>Your answer: {q.userAnswer}</p>
+                <p>Your answer: {q.userAnswer ?? "Not answered"}</p>
                 {!q.isCorrect && <p>Correct answer: {q.answer}</p>}
               </div>
               <div className="text-sm bg-muted p-2 rounded">

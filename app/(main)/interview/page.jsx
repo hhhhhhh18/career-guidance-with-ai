@@ -6,7 +6,23 @@ import QuizList from "./_components/quiz-list";
 
 export default async function InterviewPrepPage() {
   const assessments = await getAssessments();
+  const totalQuizzes = assessments.length;
 
+const averageScore =
+  totalQuizzes > 0
+    ? (
+        assessments.reduce((acc, a) => acc + (a.quizScore || 0), 0) /
+        totalQuizzes
+      ).toFixed(1)
+    : 0;
+
+const latestScore =
+  totalQuizzes > 0 ? assessments[0]?.quizScore?.toFixed(1) : 0;
+
+const totalQuestions = assessments.reduce(
+  (acc, a) => acc + (a.questions?.length || 0),
+  0
+);
   return (
     <>
           <BackToHome />

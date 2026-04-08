@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,8 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { generateQuiz, saveQuizResult } from "@/actions/interview";
 import QuizResult from "./quiz-result";
 import useFetch from "@/hooks/use-fetch";
@@ -22,14 +20,13 @@ export default function Quiz() {
   const [answers, setAnswers] = useState([]);
   const [subcategory, setSubcategory] = useState("");
 
+  const answersRef = useRef([]);
+  const quizDataRef = useRef(null);
+  const quizInitialized = useRef(false);
+
   const subcategories = [
-    "Frontend",
-    "Backend",
-    "DevOps",
-    "Cybersecurity",
-    "Data Science",
-    "AI/ML",
-    "Cloud",
+    "Frontend", "Backend", "DevOps", "Cybersecurity",
+    "Data Science", "AI/ML", "Cloud",
   ];
 
   const {
@@ -38,27 +35,30 @@ export default function Quiz() {
     data: quizData,
   } = useFetch((type) => generateQuiz(type));
 
-  const {
-    loading: savingResult,
-    fn: saveQuizResultFn,
-    data: resultData,
-    setData: setResultData,
-  } = useFetch(saveQuizResult);
+  const [resultData, setResultData] = useState(null);
 
   useEffect(() => {
-    if (quizData) {
-      setAnswers(new Array(quizData.length).fill(null));
+    if (quizData) quizDataRef.current = quizData;
+  }, [quizData]);
+
+  useEffect(() => {
+    if (quizData && quizData.length > 0 && !quizInitialized.current) {
+      quizInitialized.current = true;
+      const initial = new Array(quizData.length).fill(null);
+      answersRef.current = initial;
+      setAnswers(initial);
     }
   }, [quizData]);
 
-  const handleAnswer = (answer) => {
-    const newAnswers = [...answers];
-    newAnswers[currentQuestion] = answer;
+  const handleAnswer = (option) => {
+    const newAnswers = [...answersRef.current];
+    newAnswers[currentQuestion] = option;
+    answersRef.current = newAnswers;
     setAnswers(newAnswers);
   };
 
   const handleNext = () => {
-    if (currentQuestion < quizData.length - 1) {
+    if (currentQuestion < quizDataRef.current.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       finishQuiz();
@@ -66,28 +66,54 @@ export default function Quiz() {
   };
 
   const handlePrev = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
-    }
-  };
-
-  const calculateScore = () => {
-    let correct = 0;
-    answers.forEach((answer, index) => {
-      if (answer === quizData[index].correctAnswer) {
-        correct++;
-      }
-    });
-    return (correct / quizData.length) * 100;
+    if (currentQuestion > 0) setCurrentQuestion(currentQuestion - 1);
   };
 
   const finishQuiz = async () => {
-    const score = calculateScore();
+    const snapshotAnswers = [...answersRef.current];
+    const snapshotQuiz = [...(quizDataRef.current || [])];
+
+    if (snapshotQuiz.length === 0) {
+      toast.error("Quiz data missing");
+      return;
+    }
+
+    const isCorrect = (userAnswer, correctAnswer) =>
+      !!userAnswer &&
+      userAnswer.trim().toLowerCase() === correctAnswer?.trim().toLowerCase();
+
+    const correctCount = snapshotQuiz.reduce((acc, q, i) =>
+      acc + (isCorrect(snapshotAnswers[i], q.correctAnswer) ? 1 : 0), 0);
+
+    const score = (correctCount / snapshotQuiz.length) * 100;
+
+    // ✅ Log in browser console to confirm score and answers
+    console.log("finishQuiz - score:", score);
+    console.log("finishQuiz - snapshotAnswers:", JSON.stringify(snapshotAnswers));
+
+    const questionResults = snapshotQuiz.map((q, index) => ({
+      question: q.question,
+      answer: q.correctAnswer,
+      userAnswer: snapshotAnswers[index] ?? "Not answered",
+      isCorrect: isCorrect(snapshotAnswers[index], q.correctAnswer),
+      explanation: q.explanation,
+    }));
+
+    // Show result immediately
+    setResultData({
+      quizScore: score,
+      questions: questionResults,
+      improvementTip: "Keep practicing consistently!",
+    });
+
+    // Save to server
     try {
-      await saveQuizResultFn(quizData, answers, score);
+      const saved = await saveQuizResult(snapshotQuiz, snapshotAnswers, score, subcategory);
+      console.log("Saved to DB:", saved?.quizScore);
       toast.success("Quiz completed!");
     } catch (error) {
-      toast.error(error.message || "Failed to save quiz results");
+      console.error("Save error:", error?.message);
+      toast.error("Result shown locally — server save failed");
     }
   };
 
@@ -95,6 +121,9 @@ export default function Quiz() {
     setCurrentQuestion(0);
     setAnswers([]);
     setSubcategory("");
+    answersRef.current = [];
+    quizDataRef.current = null;
+    quizInitialized.current = false;
     generateQuizFn();
     setResultData(null);
   };
@@ -155,7 +184,10 @@ export default function Quiz() {
     );
   }
 
+  if (quizData.length === 0) return <p>No quiz data available</p>;
+
   const question = quizData[currentQuestion];
+  const selectedAnswer = answers[currentQuestion];
 
   return (
     <Card className="mx-2">
@@ -166,52 +198,41 @@ export default function Quiz() {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-lg font-medium">{question.question}</p>
-        <RadioGroup
-          onValueChange={handleAnswer}
-          value={answers[currentQuestion]}
-          className="space-y-2"
-        >
-          {question.options.map((option, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <RadioGroupItem
-                value={option}
-                id={`option-${index}`}
-                className="peer hidden"
-              />
-              <Label
-                htmlFor={`option-${index}`}
-                className="flex items-center gap-2 p-2 border rounded cursor-pointer peer-checked:bg-blue-100"
+        <div className="space-y-2">
+          {question.options.map((option, index) => {
+            const isSelected = selectedAnswer === option;
+            return (
+              <button
+                key={index}
+                type="button"
+                onClick={() => handleAnswer(option)}
+                className={`w-full flex items-center gap-3 p-3 border rounded-md text-left transition-colors ${
+                  isSelected
+                    ? "border-blue-500 bg-blue-50 text-blue-900"
+                    : "border-gray-200 hover:border-gray-400 hover:bg-gray-50"
+                }`}
               >
-                <span className="w-4 h-4 border-2 border-gray-400 rounded-full flex items-center justify-center">
-                  {answers[currentQuestion] === option && (
-                    <span className="w-2 h-2 bg-blue-500 rounded-full" />
-                  )}
+                <span
+                  className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center text-xs font-bold ${
+                    isSelected
+                      ? "border-blue-500 bg-blue-500 text-white"
+                      : "border-gray-400 text-gray-500"
+                  }`}
+                >
+                  {String.fromCharCode(65 + index)}
                 </span>
-                {option}
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
+                <span>{option}</span>
+              </button>
+            );
+          })}
+        </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button
-          onClick={handlePrev}
-          variant="outline"
-          disabled={currentQuestion === 0}
-        >
+        <Button onClick={handlePrev} variant="outline" disabled={currentQuestion === 0}>
           Previous
         </Button>
-        <Button
-          onClick={handleNext}
-          disabled={!answers[currentQuestion] || savingResult}
-          className="ml-auto"
-        >
-          {savingResult && (
-            <BarLoader className="mt-4" width={"100%"} color="gray" />
-          )}
-          {currentQuestion < quizData.length - 1
-            ? "Next Question"
-            : "Finish Quiz"}
+        <Button onClick={handleNext} disabled={!selectedAnswer} className="ml-auto">
+          {currentQuestion < quizData.length - 1 ? "Next Question" : "Finish Quiz"}
         </Button>
       </CardFooter>
     </Card>

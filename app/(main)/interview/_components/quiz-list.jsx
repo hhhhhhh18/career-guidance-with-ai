@@ -23,6 +23,8 @@ export default function QuizList({ assessments }) {
   const router = useRouter();
   const [selectedQuiz, setSelectedQuiz] = useState(null);
 
+  const total = assessments?.length ?? 0;
+
   return (
     <>
       <Card>
@@ -43,35 +45,50 @@ export default function QuizList({ assessments }) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {assessments?.map((assessment, i) => (
-              <Card
-                key={assessment.id}
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => setSelectedQuiz(assessment)}
-              >
-                <CardHeader>
-                  <CardTitle className="gradient-title text-2xl">
-                    Quiz {i + 1}
-                  </CardTitle>
-                  <CardDescription className="flex justify-between w-full">
-                    <div>Score: {assessment.quizScore.toFixed(1)}%</div>
-                    <div>
-                      {format(
-                        new Date(assessment.createdAt),
-                        "MMMM dd, yyyy HH:mm"
+            {!assessments?.length ? (
+              <p className="text-muted-foreground">
+                No quizzes taken yet
+              </p>
+            ) : (
+              assessments.map((assessment, i) => (
+                <Card
+                  key={assessment.id}
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => setSelectedQuiz(assessment)}
+                >
+                  <CardHeader>
+                    <CardTitle className="gradient-title text-2xl">
+                      Quiz {total - i}
+                      {assessment.category && assessment.category !== "General" && (
+                        <span className="ml-2 text-sm font-normal text-muted-foreground">
+                          — {assessment.category}
+                        </span>
                       )}
-                    </div>
-                  </CardDescription>
-                </CardHeader>
-                {assessment.improvementTip && (
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      {assessment.improvementTip}
-                    </p>
-                  </CardContent>
-                )}
-              </Card>
-            ))}
+                    </CardTitle>
+                    <CardDescription className="flex justify-between w-full">
+                      <div>
+                        Score: {(assessment.quizScore ?? 0).toFixed(1)}%
+                      </div>
+                      <div>
+                        {assessment.createdAt
+                          ? format(
+                              new Date(assessment.createdAt),
+                              "MMMM dd, yyyy HH:mm"
+                            )
+                          : "N/A"}
+                      </div>
+                    </CardDescription>
+                  </CardHeader>
+                  {assessment.improvementTip && (
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">
+                        {assessment.improvementTip}
+                      </p>
+                    </CardContent>
+                  )}
+                </Card>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>

@@ -7,12 +7,13 @@ export default function useFetch(fn) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const execute = async (params) => {
+  // ✅ Use ...args to accept ANY number of arguments and pass them all through
+  const execute = async (...args) => {
     try {
       setLoading(true);
       setError(null);
 
-      const result = await fn(params); // 🔥 IMPORTANT: no wrapping
+      const result = await fn(...args); // ✅ spread all args to the function
       setData(result);
       return result;
     } catch (err) {
