@@ -24,11 +24,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const handleMenuToggle = (open) => {
     setIsMenuOpen(open);
-  
-  
   };
-  
-  
 
   return (
     <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60">
@@ -36,33 +32,30 @@ export default function Header() {
 
         {/* TEXT LOGO */}
         <Link
-  href="/"
-  className="
-    text-8xl md:text-5xl
-    font-bold
-    tracking-wide
-    leading-none
-    text-foreground
-    whitespace-nowrap
-  "
->
-  Career Counselling With AI
-</Link>
-
-
+          href="/"
+          className="
+            text-lg sm:text-xl md:text-2xl lg:text-3xl
+            font-bold
+            tracking-wide
+            leading-tight
+            text-foreground
+            break-words
+          "
+        >
+          Career Counselling With AI
+        </Link>
 
         {/* Action Buttons */}
         <div className="flex items-center space-x-2 md:space-x-4">
           <SignedIn>
             <Link href="/dashboard">
-            <Button
-  variant="outline"
-  className="hidden md:inline-flex items-center gap-2 text-foreground border-border hover:bg-muted"
->
-  <LayoutDashboard className="h-4 w-4" />
-  Industry Insights
-</Button>
-
+              <Button
+                variant="outline"
+                className="hidden md:inline-flex items-center gap-2 text-foreground border-border hover:bg-muted"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                Industry Insights
+              </Button>
 
               <Button variant="ghost" className="md:hidden w-10 h-10 p-0">
                 <LayoutDashboard className="h-4 w-4" />
@@ -115,7 +108,7 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* 🌗 THEME TOGGLE (between tools & user) */}
+            {/* 🌗 THEME TOGGLE */}
             <ThemeToggle />
           </SignedIn>
 

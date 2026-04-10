@@ -65,7 +65,7 @@ export default function QuizList({ assessments }) {
                         </span>
                       )}
                     </CardTitle>
-                    <CardDescription className="flex justify-between w-full">
+                    <CardDescription className="flex flex-col sm:flex-row sm:justify-between gap-2">
                       <div>
                         Score: {(assessment.quizScore ?? 0).toFixed(1)}%
                       </div>

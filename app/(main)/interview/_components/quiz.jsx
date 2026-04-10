@@ -227,7 +227,7 @@ export default function Quiz() {
           })}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex flex-col sm:flex-row gap-2 justify-between">
         <Button onClick={handlePrev} variant="outline" disabled={currentQuestion === 0}>
           Previous
         </Button>
